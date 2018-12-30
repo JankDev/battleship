@@ -21,7 +21,6 @@ def handle_events():
             battle_loop(pygame.mouse.get_pos(), main_screen.screen)
         main_screen.handle_events(event, pygame.mouse.get_pos())
     main_screen.screen.update(window)
-
     return True
 
 

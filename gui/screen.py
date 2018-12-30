@@ -4,7 +4,8 @@ from gui.button import *
 from gui.grid import Grid
 from main.game import start_game
 from main.ship import Ship, ShipContainer
-
+from gui.input import InputField
+from db.database import Database
 pygame.init()
 
 game_screen_bg = pygame.image.load("../images/ocean.jpg")
@@ -16,19 +17,26 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 SHIP_HEIGHT = 65
-
-
-def quit_game():
-    pygame.quit()
-    quit()
+font = pygame.font.Font(pygame.font.get_default_font(), 50)
+head_font = pygame.font.Font(pygame.font.get_default_font(), 80)
 
 
 class EventObjectsContainer:
-    def __init__(self, containers):
+    container: list
+
+    def __init__(self, containers: list):
         self.container = containers
+
+    def add(self, container):
+        self.container.append(container)
+
+    def remove(self, container):
+        self.container.remove(container)
 
 
 class Screen:
+    event_container: EventObjectsContainer
+
     def __init__(self):
         self.image = None
         self.event_container = None
@@ -42,7 +50,7 @@ class Screen:
 
 
 class MainScreen(Screen):
-    def __init__(self, screen):
+    def __init__(self, screen: Screen):
         self.screen = screen
         self.screen.parent = self
 
@@ -50,11 +58,11 @@ class MainScreen(Screen):
         self.screen.draw(window)
 
     def update(self, window):
-        self.screen.update()
+        self.screen.update(window)
 
     def handle_events(self, event, pos):
-        for object in self.screen.event_container.container:
-            object.handle_events(event, pos)
+        for event_container in self.screen.event_container.container:
+            event_container.handle_events(event, pos)
 
     def change_screen(self, screen, window):
         self.screen = screen
@@ -87,9 +95,6 @@ class StartScreen(Screen):
     def update(self, window):
         pass
 
-    def next_screen(self, screen):
-        return screen
-
 
 class GameScreen(Screen):
     def __init__(self):
@@ -102,6 +107,8 @@ class GameScreen(Screen):
         self.game_started = False
         self.game_over = False
         self.display_text = ""
+        self.input_field = InputField(300, 900, 400, 50)
+        self.guesses = 0
 
     def draw(self, window):
         window.blit(self.image, (0, 0))
@@ -123,13 +130,21 @@ class GameScreen(Screen):
         ship5 = Ship(370, SHIP_HEIGHT, 5, (800, 800))
 
         self.ship_container = ShipContainer([ship1, ship2, ship3, ship4, ship5])
+
+        guess_text = font.render("Number of guesses: " + str(self.guesses), True, RED)
+        window.blit(guess_text, [1200, 900, 150, 40])
         for button in self.button_container.buttons:
             button.draw(window)
         self.ship_container.draw(window)
+        self.input_field.rect.x = window.get_rect().width / 2 - 200
         self.event_container = EventObjectsContainer([self.ship_container, self.button_container])
+        self.event_container.add(self.input_field)
 
     def update(self, window):
+
         window.blit(self.image, (0, 0))
+        guess_text = font.render("Number of guesses: " + str(self.guesses), True, RED)
+        window.blit(guess_text, [1200, 900, 150, 40])
         self.player_grid.draw(window)
         self.computer_grid.draw(window)
         for button in self.button_container.buttons:
@@ -137,18 +152,30 @@ class GameScreen(Screen):
         self.ship_container.draw(window)
         if self.game_started:
             if self.ship_container in self.event_container.container:
-                self.event_container.container.remove(self.ship_container)
+                self.event_container.remove(self.ship_container)
         if self.game_over:
+            if self.button_container:
+                self.button_container.clear()
             if self.computer_grid in self.event_container.container:
-                self.event_container.container.remove(self.computer_grid)
-            head_font = pygame.font.Font(pygame.font.get_default_font(), 130)
+                self.event_container.remove(self.computer_grid)
+
             text = head_font.render(self.display_text, True, GREEN)
             text_rect = text.get_rect()
             text_rect.center = (window.get_rect().width / 2, window.get_rect().height / 2)
             window.blit(text, text_rect)
-            quit_button2 = Button(280, 50, window.get_rect().width / 2, 900, BLACK, "Quit")
-            quit_button2.on_click(lambda: quit_game())
-            quit_button2.draw(window)
+            text2 = font.render("Type in your name", True, GREEN)
+            text_rect2 = text2.get_rect()
+            text_rect2.center = (window.get_rect().width / 2, 850)
+            window.blit(text2, text_rect2)
+            submit_button = Button(280, 50, window.get_rect().width / 2 - 140, 1000, BLACK, "Submit")
+            submit_button.on_click(lambda: [Database().save(self.input_field.text, self.guesses),
+                                            self.parent.change_screen(StartScreen(), window)])
+            submit_button.draw(window)
+
+            self.input_field.update()
+            self.input_field.draw(window)
+
+            self.button_container.add(submit_button)
 
 
 class HelpScreen(Screen):
@@ -168,8 +195,7 @@ class HelpScreen(Screen):
             button.draw(window)
 
         self.event_container = EventObjectsContainer([self.button_container])
-        font = pygame.font.Font(pygame.font.get_default_font(), 50)
-        head_font = pygame.font.Font(pygame.font.get_default_font(), 80)
+
         text = head_font.render("Rules:", True, RED)
         text2 = font.render("The goal of this game is to hit all ships of the enemy", True, RED)
         text3 = font.render("Each player has 5 ships: 2 of length 2, 1 of length 3,4,5", True, RED)
@@ -199,3 +225,12 @@ class HelpScreen(Screen):
         window.blit(text5, text_rect5)
         window.blit(text6, text_rect6)
         window.blit(text7, text_rect7)
+
+
+def quit_game():
+    pygame.quit()
+    quit()
+
+
+def save_to_database():
+    pass

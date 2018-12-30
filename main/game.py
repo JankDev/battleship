@@ -1,6 +1,5 @@
 from main.computer import Computer
 from main.player import Player
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -31,6 +30,7 @@ def start_game(game_screen):
 
 
 def battle_loop(pos, game_screen):
+
     x = (pos[0] - 1100) // 80
     y = pos[1] // 80
     tmp_rect = [x * 80 + 1100, y * 80, 80, 80]
@@ -38,8 +38,9 @@ def battle_loop(pos, game_screen):
     y = y + 1
     x = chr(x + 65)
 
+    game_screen.guesses = game_screen.guesses + 1
     for field in game_screen.computer_grid.fields:
-        if tmp_rect == field.rect:
+        if tmp_rect == field.rect and field.color != RED:
             field.color = WHITE
     for ship in computer.ships:
         if (x, y) in ship:

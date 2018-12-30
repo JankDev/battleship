@@ -15,7 +15,6 @@ class Ship(Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = coordinates[0]
         self.rect.y = coordinates[1]
-        self.coordinates = (self.rect.x, self.rect.y)
         self.dragging = False
         self.game_coordinates = list()
 
@@ -29,7 +28,6 @@ class Ship(Sprite):
     def rotate(self):
         self.image = pygame.transform.rotate(self.image, 90)
         self.rect.width, self.rect.height = self.rect.height, self.rect.width
-        print(self.rect)
 
     def on_right_click(self, event, position):
         if self.is_clicked(event, position) and event.button == 3:
