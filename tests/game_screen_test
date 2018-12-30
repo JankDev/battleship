@@ -1,0 +1,36 @@
+import pygame
+
+from gui.screen import MainScreen, GameScreen
+
+pygame.init()
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+FPS = 60
+window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+main_screen = MainScreen(GameScreen())
+main_screen.screen.draw(window)
+main_screen.screen.game_over = True
+
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            return False
+        main_screen.handle_events(event, pygame.mouse.get_pos())
+    main_screen.screen.update(window)
+    return True
+
+
+def run():
+    fpstime = pygame.time.Clock()
+    running = handle_events()
+    while running:
+        running = handle_events()
+        pygame.display.update()
+        fpstime.tick(FPS)
+
+    pygame.quit()
+    quit()
+
+
+run()
