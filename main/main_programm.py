@@ -1,13 +1,13 @@
 import pygame
 
 from gui.screen import StartScreen, MainScreen, GameScreen
-from main.game import *
+from main.game import battle_loop
 
 pygame.init()
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
 FPS = 60
-window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+music = pygame.mixer.music.load("../resources/bensound-epic.mp3")
+
+window = pygame.display.set_mode((2000, 1300))
 main_screen = MainScreen(StartScreen())
 main_screen.screen.draw(window)
 
@@ -27,6 +27,7 @@ def handle_events():
 def run():
     fpstime = pygame.time.Clock()
     running = handle_events()
+    pygame.mixer.music.play(-1)
     while running:
         running = handle_events()
         pygame.display.update()
@@ -36,4 +37,5 @@ def run():
     quit()
 
 
-run()
+if __name__ == '__main__':
+    run()

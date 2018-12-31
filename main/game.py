@@ -1,18 +1,22 @@
+import pygame
+
 from main.computer import Computer
 from main.player import Player
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-player = Player("")
+from resources.colors import *
+
+pygame.init()
+
+player = Player()
 computer = Computer()
 game_started = False
+hit_sound = pygame.mixer.Sound("../resources/bomb.wav")
 
 
 def start_game(game_screen):
     global player, computer, game_started
     game_started = True
-    player = Player("Jacek")
-
+    player = Player()
+    computer = Computer()
     ships = list()
     for ship in game_screen.ship_container.sprites():
         if ship.rect.width > ship.rect.height:
@@ -23,64 +27,68 @@ def start_game(game_screen):
                 [(ship.rect.center[0] // 80) * 80, (ship.rect.y // 80) * 80, 80, 80 * ship.fields])
         ships.append(ship.get_game_coordinates())
 
-    player.set_ships(ships)
-    computer.setBoard()
-
-    game_screen.game_started = True
+    if not is_valid(ships):
+        game_screen.pop_up = True
+    else:
+        player.set_ships(ships)
+        computer.set_board()
+        game_screen.game_started = True
+        game_screen.button_container.buttons.pop(0),
+        game_screen.event_container.container.append(game_screen.computer_grid)
 
 
 def battle_loop(pos, game_screen):
-
     x = (pos[0] - 1100) // 80
     y = pos[1] // 80
     tmp_rect = [x * 80 + 1100, y * 80, 80, 80]
 
-    y = y + 1
-    x = chr(x + 65)
-
     game_screen.guesses = game_screen.guesses + 1
-    for field in game_screen.computer_grid.fields:
-        if tmp_rect == field.rect and field.color != RED:
-            field.color = WHITE
-    for ship in computer.ships:
-        if (x, y) in ship:
-            for field in game_screen.computer_grid.fields:
-                if tmp_rect == field.rect:
-                    field.color = RED
-            ship.remove((x, y))
-            break
+    if computer.got_ship_hit((x, y)):
+        pygame.mixer.Sound.play(hit_sound)
+        game_screen.computer_grid.change_field_color(tmp_rect, RED)
+        computer.remove_point_from_ship((x, y))
+
+    else:
+        game_screen.computer_grid.change_field_color(tmp_rect, WHITE)
 
     computer.remove_empty_ships()
+
     if not computer.ships:
         game_screen.game_started = False
         game_screen.game_over = True
         game_screen.display_text = "YOU WON"
+
     computer_guess = computer.point_selection()
+    tmp_rect = [computer_guess[0] * 80, computer_guess[1] * 80, 80, 80]
 
-    tmp_rect = [computer_guess[0] * 80, (computer_guess[1] - 1) * 80, 80, 80]
-    for field in game_screen.player_grid.fields:
-        if tmp_rect == field.rect:
-            field.color = WHITE
-            field.draw_function = field.on_click_draw
-            break
+    if player.got_ship_hit(computer_guess):
 
-    for ship in player.ships:
-        if con(computer_guess) in ship:
+        pygame.mixer.Sound.play(hit_sound)
+        game_screen.player_grid.change_field_color(tmp_rect, RED)
+        player.remove_point_from_ship(computer_guess)
 
-            for field in game_screen.player_grid.fields:
-                if tmp_rect == field.rect:
-                    field.color = RED
-                    break
-            ship.remove(con(computer_guess))
-            break
+    else:
+        game_screen.player_grid.change_field_color(tmp_rect, WHITE)
 
     player.delete_empty_ships()
+
     if not player.ships:
         game_screen.game_started = False
         game_screen.game_over = True
         game_screen.display_text = "YOU LOST"
+        game_screen.text_color = RED
 
 
-def con(point):
-    temp = (chr(point[0] + 65), point[1])
-    return temp
+def is_valid(ships):
+    near_points = list()
+    for ship in ships:
+        for point in ship:
+
+            if 9 < (point[0] or point[1]) or (point[0] or point[1]) < 0 or (point in near_points):
+                return False
+            near_points.append(point)
+            near_points.append((point[0] + 1, point[1] + 1))
+            near_points.append((point[0] - 1, point[1] - 1))
+            near_points.append((point[0] + 1, point[1] - 1))
+            near_points.append((point[0] - 1, point[1] + 1))
+    return True

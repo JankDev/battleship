@@ -13,3 +13,14 @@ class Database:
     def save(self, name, score):
         record = {"name": name, "score": score}
         self.database["scores"].insert_one(record)
+
+    def get_all(self):
+        rows = list()
+        records = list(self.database["scores"].find({}, {"_id": 0, "name": 1, "score": 1}).sort("score").limit(10))
+        for item in records:
+            rows.append((item["name"], int(item["score"])))
+
+        return rows
+
+
+print(Database().get_all())

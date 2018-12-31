@@ -4,7 +4,7 @@ pg.init()
 
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
-FONT = pg.font.Font(None, 25)
+FONT = pg.font.Font(None, 50)
 WHITE = (255, 255, 255)
 
 
@@ -44,6 +44,7 @@ class InputField:
     def draw(self, screen):
 
         self.txt_surface = FONT.render(self.text, True, (0, 0, 0))
+        pg.draw.rect(screen, self.color, self.rect, 3)
+        pg.draw.rect(screen, WHITE, [self.rect.x + 3, self.rect.y + 3, self.rect.width - 6, self.rect.height - 6])
 
-        pg.draw.rect(screen, WHITE, self.rect)
-        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        screen.blit(self.txt_surface, (self.rect.x + 8, self.rect.y + 8))
