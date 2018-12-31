@@ -1,11 +1,7 @@
-import pygame as pg
+from resources.colors import *
+from resources.fonts import *
 
 pg.init()
-
-COLOR_INACTIVE = pg.Color('lightskyblue3')
-COLOR_ACTIVE = pg.Color('dodgerblue2')
-FONT = pg.font.Font(None, 50)
-WHITE = (255, 255, 255)
 
 
 class InputField:
@@ -14,7 +10,7 @@ class InputField:
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
-        self.txt_surface = FONT.render(text, True, (0, 0, 0))
+        self.txt_surface = INPUT_FONT.render(text, True, (0, 0, 0))
         self.active = False
 
     def handle_events(self, event, pos):
@@ -34,7 +30,7 @@ class InputField:
                 else:
                     self.text += event.unicode
 
-                self.txt_surface = FONT.render(self.text, True, (0, 0, 0))
+                self.txt_surface = INPUT_FONT.render(self.text, True, (0, 0, 0))
 
     def update(self):
 
@@ -43,7 +39,7 @@ class InputField:
 
     def draw(self, screen):
 
-        self.txt_surface = FONT.render(self.text, True, (0, 0, 0))
+        self.txt_surface = INPUT_FONT.render(self.text, True, (0, 0, 0))
         pg.draw.rect(screen, self.color, self.rect, 3)
         pg.draw.rect(screen, WHITE, [self.rect.x + 3, self.rect.y + 3, self.rect.width - 6, self.rect.height - 6])
 

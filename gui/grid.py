@@ -1,13 +1,8 @@
-import pygame
-
 from db.database import Database
+from resources.colors import *
+from resources.fonts import *
 
 pygame.init()
-
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-WHITE = (255, 255, 255)
-font = pygame.font.Font(pygame.font.get_default_font(), 20)
 
 
 class Field:
@@ -46,10 +41,10 @@ class Grid:
 
     def change_field_color(self, rect: pygame.rect, color):
         for field in self.fields:
-            print(field.rect)
+
             if rect == field.rect and not field.color:
                 field.color = color
-                field.draw_function = field.draw
+                field.draw_function = field.on_click_draw
                 break
 
 
@@ -64,18 +59,18 @@ class Table:
     def draw(self, screen):
         db_result = Database().get_all()
         i = 0
-        a = 0
+
         for field in self.fields:
             field.draw_function(screen)
 
             if int(i) == i:
-                text = font.render(db_result[int(i)][0], True, (0, 0, 0))
+                text = table_font.render(db_result[int(i)][0], True, (0, 0, 0))
                 text_rect = text.get_rect()
                 text_rect.center = ((field.rect.x + (field.rect.width / 2)),
                                     (field.rect.y + (field.rect.height / 2)))
                 screen.blit(text, text_rect)
             else:
-                text = font.render(str(db_result[int(i - 0.5)][1]), True, (0, 0, 0))
+                text = table_font.render(str(db_result[int(i - 0.5)][1]), True, (0, 0, 0))
                 text_rect = text.get_rect()
                 text_rect.center = ((field.rect.x + (field.rect.width / 2)),
                                     (field.rect.y + (field.rect.height / 2)))

@@ -5,10 +5,6 @@ pygame.init()
 
 class Button:
     def __init__(self, width, height, x, y, color, text):
-        self.width = width
-        self.height = height
-        self.x = x
-        self.y = y
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
         self.text = text
@@ -21,10 +17,10 @@ class Button:
         font = pygame.font.Font(pygame.font.get_default_font(), 20)
         text = font.render(self.text, True, (0xff, 0xff, 0xff))
         text_rect = text.get_rect()
-        text_rect.center = ((self.x + (self.width / 2)), (self.y + (self.height / 2)))
+        text_rect.center = self.rect.center
         screen.blit(text, text_rect)
 
-    def handle_events(self, event, pos):
+    def handle_events(self, event: pygame.event, pos):
         if self.rect.collidepoint(pos):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.on_click(self.function)
@@ -36,6 +32,9 @@ class Button:
         if self.active:
             self.function()
         self.active = True
+
+    def update(self):
+        pass
 
 
 class ButtonContainer:

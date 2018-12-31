@@ -7,18 +7,15 @@ from gui.input import InputField
 from main.game import start_game
 from main.ship import Ship, ShipContainer
 from resources.colors import *
+from resources.fonts import *
 
 pygame.init()
 
 game_screen_bg = pygame.image.load("../resources/ocean.jpg")
 start_screen_bg = pygame.image.load("../resources/ship_background")
 
-
 SHIP_HEIGHT = 65
-font = pygame.font.Font(pygame.font.get_default_font(), 50)
-small_font = pygame.font.Font(pygame.font.get_default_font(), 30)
-game_over_font = pygame.font.Font(pygame.font.get_default_font(), 300)
-head_font = pygame.font.Font(pygame.font.get_default_font(), 70)
+
 
 class EventObjectsContainer:
     container: list
@@ -79,7 +76,7 @@ class StartScreen(Screen):
     def draw(self, window):
         window.blit(self.image, (0, 0))
         exit_button = Button(350, 70, window.get_rect().width / 2 - 175, 700, BLACK, "Exit")
-        exit_button.on_click(lambda: quit_game())
+        exit_button.on_click(quit_game)
         play_button = Button(350, 70, window.get_rect().width / 2 - 175, 400, BLACK, "Play vs Computer")
         play_button.on_click(lambda: self.parent.change_screen(GameScreen(), window))
         help_button = Button(350, 70, window.get_rect().width / 2 - 175, 500, BLACK, "Help")
@@ -87,13 +84,16 @@ class StartScreen(Screen):
         scores_button = Button(350, 70, window.get_rect().width / 2 - 175, 600, BLACK, "Scores")
         scores_button.on_click(lambda: self.parent.change_screen(ScoreScreen(), window))
         self.button_container = ButtonContainer((exit_button, play_button, scores_button, help_button))
-        tmp = [self.button_container]
-        self.event_container = EventObjectsContainer(tmp)
+
+        self.event_container = EventObjectsContainer([self.button_container])
         for button in self.button_container.buttons:
             button.draw(window)
 
     def update(self, window):
-        pass
+        window.blit(self.image, (0, 0))
+
+        for button in self.button_container.buttons:
+            button.draw(window)
 
 
 class GameScreen(Screen):
@@ -121,7 +121,7 @@ class GameScreen(Screen):
         start_button = Button(280, 50, 810, 100, BLACK, "Start")
         start_button.on_click(lambda: start_game(self))
         quit_button = Button(280, 50, 810, 200, BLACK, "Quit")
-        quit_button.on_click(lambda: quit_game())
+        quit_button.on_click(quit_game)
         self.button_container = ButtonContainer([start_button, quit_button])
 
         ship1 = Ship(200, SHIP_HEIGHT, 3, (300, 800))
@@ -148,7 +148,7 @@ class GameScreen(Screen):
         window.blit(guess_text, [1200, 900, 150, 40])
         self.player_grid.draw(window)
         self.computer_grid.draw(window)
-
+        self.ship_container.draw(window)
         ok_button = Button(100, 30, window.get_rect().width / 2 - 50, window.get_rect().height / 2 + 30, BLACK, "Ok")
         ok_button.on_click(self.no_pop)
 
@@ -165,7 +165,7 @@ class GameScreen(Screen):
             self.event_container.add(ok_button)
         for button in self.button_container.buttons:
             button.draw(window)
-        self.ship_container.draw(window)
+
         if self.game_started:
             if self.ship_container in self.event_container.container:
                 self.event_container.remove(self.ship_container)
@@ -192,15 +192,10 @@ class GameScreen(Screen):
                                             self.parent.change_screen(StartScreen(), window)])
             submit_button.draw(window)
 
-
-
             self.button_container.add(submit_button)
 
     def no_pop(self):
         self.pop_up = False
-
-
-
 
 
 class HelpScreen(Screen):
@@ -228,34 +223,14 @@ class HelpScreen(Screen):
         text5 = head_font.render("Mechanics:", True, GREEN)
         text6 = font.render("Drag the ship to move it, to rotate it right click it", True, GREEN)
         text7 = font.render("After clicking start the game starts.Click on the right for your guesses", True, GREEN)
-
-        text_rect = text.get_rect()
-        text_rect2 = text2.get_rect()
-        text_rect3 = text3.get_rect()
-        text_rect4 = text4.get_rect()
-        text_rect5 = text5.get_rect()
-        text_rect6 = text6.get_rect()
-        text_rect7 = text7.get_rect()
-        text_rect.topleft = (100, 100)
-        text_rect2.topleft = (100, 200)
-        text_rect3.topleft = (100, 300)
-        text_rect4.topleft = (100, 400)
-        text_rect5.topleft = (100, 500)
-        text_rect6.topleft = (100, 600)
-        text_rect7.topleft = (100, 700)
-        window.blit(text, text_rect)
-        window.blit(text2, text_rect2)
-        window.blit(text3, text_rect3)
-        window.blit(text4, text_rect4)
-        window.blit(text5, text_rect5)
-        window.blit(text6, text_rect6)
-        window.blit(text7, text_rect7)
+        text_container = [text, text2, text3, text4, text5, text6, text7]
+        for i in range(7):
+            window.blit(text_container[i], (100, (i + 1) * 100))
 
 
 class ScoreScreen(Screen):
     def __init__(self):
         super().__init__()
-        self.image = scores_bg
         self.button_container = None
         self.event_container = None
 
@@ -274,9 +249,7 @@ class ScoreScreen(Screen):
 
     def update(self, window):
         window.fill(GOLD)
-        back_button = Button(350, 50, window.get_rect().width / 2 - 175, 1000, BLACK, "Back")
-        back_button.on_click(lambda: self.parent.change_screen(StartScreen(), window))
-        self.button_container = ButtonContainer([back_button])
+
         for button in self.button_container.buttons:
             button.draw(window)
 
@@ -286,9 +259,8 @@ class ScoreScreen(Screen):
         text_rect = text.get_rect()
         text_rect.center = (window.get_rect().width / 2, 60)
         window.blit(text, text_rect)
-        self.event_container = EventObjectsContainer([self.button_container])
+
+
 def quit_game():
     pygame.quit()
     quit()
-
-

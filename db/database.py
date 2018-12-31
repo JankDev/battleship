@@ -21,6 +21,3 @@ class Database:
             rows.append((item["name"], int(item["score"])))
 
         return rows
-
-
-print(Database().get_all())

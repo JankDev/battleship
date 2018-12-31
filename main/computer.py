@@ -15,7 +15,7 @@ class Computer:
     def place_ship(self, length):
         temp_list = list()
         first = True
-        while first or is_point_not_on_board(temp_list) or contains_point(temp_list):
+        while first or are_points_not_on_board(temp_list) or contains_point(temp_list):
             first = False
             temp_list.clear()
             vertical = bool(random.getrandbits(1))
@@ -107,5 +107,9 @@ def contains_point(temp_list):
     return False
 
 
-def is_point_not_on_board(temp_list):
-    return 9 < (temp_list[-1][0] or temp_list[-1][1]) or (temp_list[-1][0] or temp_list[-1][1]) < 0
+def are_points_not_on_board(temp_list):
+    for point in temp_list:
+        if 9 < point[0] or 9 < point[1] or point[0] < 0 or point[1] < 0:
+            return True
+
+    return False
