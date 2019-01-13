@@ -11,8 +11,9 @@ class Database:
         self.database = mydb
 
     def save(self, name, score):
-        record = {"name": name, "score": score}
-        self.database["scores"].insert_one(record)
+        if name:
+            record = {"name": name, "score": score}
+            self.database["scores"].insert_one(record)
 
     def get_all(self):
         rows = list()

@@ -45,6 +45,8 @@ def start_game(game_screen):
 
 
 def battle_loop(pos, game_screen):
+    computer.player_ships = player.ships
+
     x = (pos[0] - 1100) // FIELD_SIZE
     y = pos[1] // FIELD_SIZE
     tmp_rect = [x * FIELD_SIZE + 1100, y * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE]
@@ -66,9 +68,13 @@ def battle_loop(pos, game_screen):
         game_screen.display_text = "YOU WON"
 
     computer_guess = computer.point_selection()
+
     tmp_rect = [computer_guess[0] * FIELD_SIZE, computer_guess[1] * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE]
 
     if player.got_ship_hit(computer_guess):
+        if not computer.hunt_mode:
+            computer.goto_hunt_mode_selection(computer_guess)
+            computer.hunt_mode = True
 
         pygame.mixer.Sound.play(hit_sound)
         game_screen.player_grid.change_field_color(tmp_rect, RED)

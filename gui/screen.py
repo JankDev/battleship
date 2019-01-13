@@ -156,7 +156,7 @@ class GameScreen(Screen):
             box = pygame.Rect(window.get_rect().width / 2, window.get_rect().height / 2, 700, 300)
             box.center = (window.get_rect().width / 2, window.get_rect().height / 2)
             pygame.draw.rect(window, WHITE, box)
-            text = small_font.render("Invalid ship position!Change it ", True, GREEN)
+            text = small_font.render("Invalid ship position!Change it ", True, RED)
             text_rect = text.get_rect()
             text_rect.center = (window.get_rect().width / 2, window.get_rect().height / 2)
             window.blit(text, text_rect)
