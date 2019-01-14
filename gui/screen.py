@@ -188,7 +188,8 @@ class GameScreen(Screen):
                 self.input_field.update()
                 self.input_field.draw(window)
             submit_button = Button(350, 80, window.get_rect().width / 2 - 175, 900, BLACK, "Ok")
-            submit_button.on_click(lambda: [Database().save(self.input_field.text, self.guesses),
+
+            submit_button.on_click(lambda: [Database.save(self.guesses, self.input_field.text),
                                             self.parent.change_screen(StartScreen(), window)])
             submit_button.draw(window)
 

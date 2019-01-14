@@ -1,3 +1,6 @@
+from queue import Queue
+from threading import Thread
+
 import pygame
 
 from main.computer import Computer
@@ -66,14 +69,19 @@ def battle_loop(pos, game_screen):
         game_screen.game_started = False
         game_screen.game_over = True
         game_screen.display_text = "YOU WON"
+    que = Queue()
+    thread = Thread(target=lambda q: q.put(computer.point_selection()), args=(que,))
+    thread.start()
+    thread.join()
 
-    computer_guess = computer.point_selection()
+    computer_guess = que.get()
 
     tmp_rect = [computer_guess[0] * FIELD_SIZE, computer_guess[1] * FIELD_SIZE, FIELD_SIZE, FIELD_SIZE]
 
     if player.got_ship_hit(computer_guess):
         if not computer.hunt_mode:
-            computer.goto_hunt_mode_selection(computer_guess)
+            thread = Thread(target=computer.goto_hunt_mode_selection, args=(computer_guess,))
+            thread.start()
             computer.hunt_mode = True
 
         pygame.mixer.Sound.play(hit_sound)

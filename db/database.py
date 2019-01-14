@@ -10,7 +10,7 @@ class Database:
     def __init__(self):
         self.database = mydb
 
-    def save(self, name, score):
+    def save(self, score, name=""):
         if name:
             record = {"name": name, "score": score}
             self.database["scores"].insert_one(record)
