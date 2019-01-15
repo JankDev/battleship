@@ -7,7 +7,7 @@ pygame.init()
 FPS = 60
 music = pygame.mixer.music.load("../resources/bensound-epic.mp3")
 
-window = pygame.display.set_mode((2000, 1000))
+window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 main_screen = MainScreen(StartScreen())
 main_screen.screen.draw(window)
 
