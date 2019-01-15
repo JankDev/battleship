@@ -1,12 +1,19 @@
 import random
 
-import pymongo as mg
+try:
+    import pymongo as mg
+except ImportError as err:
+    print(err)
+    exit()
 
-myclient = mg.MongoClient("mongodb://localhost:27017/")
+maxSevSelDelay = 2
+try:
+    myclient = mg.MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=maxSevSelDelay)
+except mg.errors.ServerSelectionTimeoutError as err:
+    print(err)
+    exit()
 
 mydb = myclient["battleship"]
-mycol = mydb["points"]
-
 random.seed()
 
 used_random_points = list()

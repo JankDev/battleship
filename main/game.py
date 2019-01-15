@@ -1,7 +1,11 @@
 from queue import Queue
 from threading import Thread
 
-import pygame
+try:
+    import pygame
+except ImportError as err:
+    print(err)
+    exit()
 
 from main.computer import Computer
 from main.player import Player
